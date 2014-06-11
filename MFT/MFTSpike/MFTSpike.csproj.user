@@ -8,8 +8,8 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|ARM'">
     <DeviceId>30F105C9-681E-420b-A277-7C086EAD8A4E</DeviceId>
-    <DebugEngines>{3B476D35-A401-11D2-AAD4-00C04F990171}</DebugEngines>
-    <EnableUnmanagedDebugging>true</EnableUnmanagedDebugging>
-    <BackgroundTaskDebugEngines>{3B476D35-A401-11D2-AAD4-00C04F990171}</BackgroundTaskDebugEngines>
+    <DebugEngines>{2E36F1D4-B23C-435D-AB41-18E608940038}</DebugEngines>
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <BackgroundTaskDebugEngines>{2E36F1D4-B23C-435D-AB41-18E608940038}</BackgroundTaskDebugEngines>
   </PropertyGroup>
 </Project>

@@ -12,8 +12,11 @@
         <StackPanel >
             <Button VerticalAlignment="Top" Click="Button_Click" >
             </Button>
+            <Button VerticalAlignment="Top" Click="Button_ClickStop" >
+            </Button>
+
             <Canvas x:Name="preview_canvas" Background="Red">
-                <CaptureElement Name="capture_element" />
+                <CaptureElement Name="capture_element"  />
             </Canvas>
         </StackPanel>
     </Grid>

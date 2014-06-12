@@ -30,24 +30,34 @@ namespace MFTSpike
 
             this.NavigationCacheMode = NavigationCacheMode.Required;
             m_camera = new MediaCapture();
+           
             m_camera.InitializeAsync();
         }
-        
-  
+
+        //public FileIO io = new FileIO()
+
         protected override void OnNavigatedTo(NavigationEventArgs e)
         {
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+
+        private async void Button_ClickStop(object sender, RoutedEventArgs e)
+        {
+            m_camera.StopRecordAsync();
+        }
+
+        private async void Button_Click(object sender, RoutedEventArgs e)
         {
             capture_element.Source = m_camera;
             m_camera.StartPreviewAsync();
             
-            //var file = Windows.Storage.KnownFolders.CameraRoll.CreateFileAsync("_exposure.jpg", CreationCollisionOption.ReplaceExisting);
-            //m_camera.StartRecordToStorageFileAsync(Windows.Media.MediaProperties.MediaEncodingProfile.CreateAvi(Windows.Media.MediaProperties.VideoEncodingQuality.Vga), );
+            //StorageFile file = await KnownFolders.DocumentsLibrary.CreateFileAsync("_exposure.jpg", CreationCollisionOption.ReplaceExisting);
+            
             
             m_camera.AddEffectAsync(MediaStreamType.VideoPreview, "GrayscaleTransform.GrayscaleEffect", null);
-
+            
+          
+            //m_camera.StartRecordToStorageFileAsync()
             float maxExp = m_camera.VideoDeviceController.ExposureCompensationControl.Max;
             float minExp = m_camera.VideoDeviceController.ExposureCompensationControl.Min;
             float step = m_camera.VideoDeviceController.ExposureCompensationControl.Step;
@@ -57,10 +67,28 @@ namespace MFTSpike
             TimeSpan stepExp = m_camera.VideoDeviceController.ExposureControl.Step;
 
             TimeSpan value = m_camera.VideoDeviceController.ExposureControl.Value;
-            TimeSpan k = new TimeSpan(83333);
-            
-            m_camera.VideoDeviceController.ExposureControl.SetValueAsync(k);
-            
+             var supportedVideoFormats = new List<string> { "nv12", "rgb32" };
+
+             var availableMediaStreamProperties = m_camera.VideoDeviceController.GetAvailableMediaStreamProperties(MediaStreamType.VideoRecord).OfType<Windows.Media.MediaProperties.VideoEncodingProperties>().Where(p => p != null 
+                && !String.IsNullOrEmpty(p.Subtype) 
+                && supportedVideoFormats.Contains(p.Subtype.ToLower()))
+            .ToList();
+
+             Windows.Media.MediaProperties.VideoEncodingProperties previewFormat = availableMediaStreamProperties.FirstOrDefault();
+
+            //previewFormat.FrameRate.Numerator = 15;
+            //previewFormat.FrameRate.Denominator = 1;
+
+             //availableMediaStreamProperties.All;
+            m_camera.VideoDeviceController.SetMediaStreamPropertiesAsync(MediaStreamType.VideoRecord, previewFormat );
+
+            m_camera.VideoDeviceController.ExposureControl.SetAutoAsync(false);
+
+            TimeSpan k = new TimeSpan(833);
+            m_camera.VideoDeviceController.ExposureControl.SetValueAsync(minExpControl);
+
+            await this.StreamToFile();
+
             //m_camera.VideoDeviceController.ExposureCompensationControl.SetValueAsync(0);
             //m_camera.VideoDeviceController.ExposureCompensationControl.SetValueAsync(0.0f);
 
@@ -74,6 +102,20 @@ namespace MFTSpike
 
           //  m_camera.VideoDeviceController.ExposureControl.SetValueAsync(minExpControl);
 
+        }
+
+        private async Task StreamToFile()
+        {
+            try
+            {
+              
+                StorageFile file = await KnownFolders.VideosLibrary.CreateFileAsync("file.mp4", CreationCollisionOption.ReplaceExisting);
+                await m_camera.StartRecordToStorageFileAsync(Windows.Media.MediaProperties.MediaEncodingProfile.CreateMp4(Windows.Media.MediaProperties.VideoEncodingQuality.HD720p), file);
+            }
+            catch
+            {
+                int i;
+            }
         }
     }
 }
